@@ -1,0 +1,265 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <ctime>
+#include <map>
+
+
+struct Player {
+    std::string name;
+    int health;
+    int location_x;
+    int location_y;
+    std::map<std::string, int> inventory;
+
+};
+
+bool is_in_safe_zone(const Player& player, int safe_zone_radius) {
+    return (player.location_x * player.
+        
+        
+        location_x +player.location_y * player.location_y) <= (safe_zone_radius * safe_zone_radius);
+
+}
+
+void loot(Player & player) {
+
+    std::vector<std::string> loot_items = {"Med kit", "Ammo", "Vest", "Helmet", "Rifle"};
+    
+    std::string item = loot_items[rand() % loot_items.size()];
+
+    player.inventory[item]++;
+
+    std::cout << player.name << "found a " << item << "!" << std::endl;
+}
+
+int main() {
+    srand(time(0));
+
+    std::cout <<"-------------------------------------------------" << std::endl;
+    std::cout <<"      Text-Based PUBG Simulation                 " << std::endl;
+    std::cout <<"-------------------------------------------------" <<  std::endl;
+
+    const int initial_safe_zone_radius = 50;
+    const int game_rounds = 5;
+
+    std::vector<Player> players;
+    players.push_back({"Player1", 100, 0, 0 ,{}});
+    players.push_back({"player2", 100, 10, 20 ,{}});
+    players.push_back({"player3", 100, -30, -40, {}});
+
+    int safe_zone_radius = initial_safe_zone_radius;
+
+    for (int round = 1; round <= game_rounds; ++round) {
+        std::cout << "\n --- Round " << round << "---" << std::endl;
+        safe_zone_radius -=10;
+        std::cout << "the safe zone has shrunk! New radius: " << safe_zone_radius << std::endl;
+        
+        for( auto& player : players) {
+            std::cout << "\n" << player.name <<"'s turn. " << std::endl;
+
+            player.location_x +=rand() % 5 - 2;
+            player.location_y +=rand() % 5 - 2;
+
+            std::cout << " - Moved to (" << player.location_x << ", " << player.location_y << ")" << std::endl;
+            
+            if (rand() % 10 < 7) {
+                loot(player);
+            }
+
+            if (!is_in_safe_zone(player, safe_zone_radius)) {
+                std::cout << " - " << player.name <<" is outside the safe zone and takes damage!" << std::endl;
+                player.health -= 10;
+                if (player.health <= 0) {
+                    std::cout << " - " << player.name << "has been eliminated!" << std::endl;
+
+                }
+            }
+        }
+    }
+
+    std::cout << "\n--- Final Results ---" << std::endl;
+    for (const auto& player : players) {
+        std::cout << player.name << ": Health =" << player.health << ", Inventeory: ";
+        if (player.inventory.empty()) {
+            std::cout << "Empty";
+        } else {
+            for (const auto& item : player.inventory) {
+                std::cout << item.first << "x " << item.second <<", ";
+            }
+        }
+        std::cout << std::endl;
+
+    }
+    return 0;
+}
+
+
+
+
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <limits>
+#include <algorithm>
+#include <iomanip>
+
+// Define the structure for a single contact
+struct Contact {
+    std::string name;
+    std::string phoneNumber;
+    std::string email;
+};
+
+// --- Helper function for robust input clearing ---
+void clearInput() {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+}
+
+// --- Function to add a new contact ---
+void addContact(std::vector<Contact>& contacts) {
+    Contact newContact;
+    std::cout << "\n--- Add New Contact ---\n";
+
+    // Get Name
+    std::cout << "Enter Name: ";
+    // Use getline to handle names with spaces
+    std::cin.ignore(); 
+    std::getline(std::cin, newContact.name);
+
+    // Get Phone Number
+    std::cout << "Enter Phone Number: ";
+    std::getline(std::cin, newContact.phoneNumber);
+
+    // Get Email (optional)
+    std::cout << "Enter Email (optional): ";
+    std::getline(std::cin, newContact.email);
+
+    // Add the new contact to the vector
+    contacts.push_back(newContact);
+    std::cout << "\n[SUCCESS] Contact '" << newContact.name << "' added successfully!\n";
+}
+
+// --- Function to view all stored contacts ---
+void viewContacts(const std::vector<Contact>& contacts) {
+    std::cout << "\n--- Contact List (" << contacts.size() << " total) ---\n";
+    if (contacts.empty()) {
+        std::cout << "The contact list is empty. Add a new contact first.\n";
+        return;
+    }
+
+    // Set up table formatting
+    std::cout << std::left 
+              << std::setw(20) << "NAME" 
+              << std::setw(15) << "PHONE" 
+              << "EMAIL" << "\n";
+    std::cout << std::string(60, '-') << "\n";
+
+    // Iterate and print all contacts
+    for (size_t i = 0; i < contacts.size(); ++i) {
+        std::cout << std::left 
+                  << std::setw(20) << contacts[i].name 
+                  << std::setw(15) << contacts[i].phoneNumber 
+                  << contacts[i].email << "\n";
+    }
+    std::cout << std::string(60, '-') << "\n";
+}
+
+// --- Function to search for contacts by name ---
+void searchContacts(const std::vector<Contact>& contacts) {
+    std::string searchName;
+    std::cout << "\n--- Search Contacts ---\n";
+    std::cout << "Enter name to search: ";
+    std::cin.ignore();
+    std::getline(std::cin, searchName);
+
+    std::vector<Contact> foundContacts;
+
+    // Use a case-insensitive search logic
+    std::string lowerSearchName;
+    std::transform(searchName.begin(), searchName.end(), std::back_inserter(lowerSearchName),
+                   [](unsigned char c){ return std::tolower(c); });
+
+    // Iterate through all contacts
+    for (const auto& contact : contacts) {
+        std::string lowerContactName;
+        std::transform(contact.name.begin(), contact.name.end(), std::back_inserter(lowerContactName),
+                       [](unsigned char c){ return std::tolower(c); });
+
+        // Check if the contact name contains the search string
+        if (lowerContactName.find(lowerSearchName) != std::string::npos) {
+            foundContacts.push_back(contact);
+        }
+    }
+
+    // Output results
+    if (foundContacts.empty()) {
+        std::cout << "\n[INFO] No contacts found matching '" << searchName << "'.\n";
+    } else {
+        std::cout << "\n[INFO] Found " << foundContacts.size() << " match(es):\n";
+        // Re-use the view function logic for neat output
+        std::cout << std::left 
+                  << std::setw(20) << "NAME" 
+                  << std::setw(15) << "PHONE" 
+                  << "EMAIL" << "\n";
+        std::cout << std::string(60, '-') << "\n";
+        for (const auto& contact : foundContacts) {
+             std::cout << std::left 
+                  << std::setw(20) << contact.name 
+                  << std::setw(15) << contact.phoneNumber 
+                  << contact.email << "\n";
+        }
+        std::cout << std::string(60, '-') << "\n";
+    }
+}
+
+// --- Main execution function ---
+int main() {
+    // Vector to store all Contact structures (our main database)
+    std::vector<Contact> contacts;
+    int choice;
+
+    // Main menu loop
+    do {
+        std::cout << "\n============================================\n";
+        std::cout << "        C++ PHONE CONTACT MANAGER\n";
+        std::cout << "============================================\n";
+        std::cout << "1. Add New Contact\n";
+        std::cout << "2. View All Contacts\n";
+        std::cout << "3. Search Contact by Name\n";
+        std::cout << "4. Exit Program\n";
+        std::cout << "--------------------------------------------\n";
+        std::cout << "Enter your choice (1-4): ";
+
+        if (!(std::cin >> choice)) {
+            // Handle non-integer input gracefully
+            std::cout << "\n[ERROR] Invalid input. Please enter a number.\n";
+            std::cin.clear(); // Clear error flags
+            clearInput();    // Discard remaining input
+            choice = 0;      // Set choice to a value that repeats the loop
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                addContact(contacts);
+                break;
+            case 2:
+                viewContacts(contacts);
+                break;
+            case 3:
+                searchContacts(contacts);
+                break;
+            case 4:
+                std::cout << "\nExiting Contact Manager. Goodbye!\n";
+                break;
+            default:
+                std::cout << "\n[WARNING] Invalid choice. Please select an option between 1 and 4.\n";
+                break;
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
