@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduHub - Student Project, Assignment & Interview System</title>
+    <!-- Tailwind CSS Engine -->
+    <script src="https://jsdelivr.net"></script>
+    <link rel="stylesheet" href="https://cloudflare.com">
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- Header Navigation -->
+    <header class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl">🎓</span>
+                <div>
+                    <h1 class="text-xl font-bold tracking-tight">EduSuccess Suite</h1>
+                    <p class="text-xs text-indigo-200">Projects • Assignments • Interview Simulator</p>
+                </div>
+            </div>
+            
+            <!-- Tab Controller Engine -->
+            <nav class="flex bg-indigo-900/40 p-1 rounded-xl border border-indigo-500/20">
+                <button onclick="switchTab('projects')" id="tab-projects" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all bg-white text-indigo-900 shadow-sm">
+                    📁 Project Showcase
+                </button>
+                <button onclick="switchTab('assignments')" id="tab-assignments" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-indigo-100 hover:bg-indigo-700/40">
+                    📝 Assignment Planner
+                </button>
+                <button onclick="switchTab('interviews')" id="tab-interviews" class="tab-btn px-4 py-2 rounded-lg text-sm font-medium transition-all text-indigo-100 hover:bg-indigo-700/40">
+                    💼 Interview Prep
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Application Window -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8">
+        
+        <!-- SECTION 1: PROJECT SHOWCASE PANEL -->
+        <section id="panel-projects" class="tab-panel space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">Student Innovation Gallery</h2>
+                    <p class="text-sm text-slate-500">Document, track, and showcase student engineering and capstone work.</p>
+                </div>
+                <button onclick="toggleModal(true)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2.5 rounded-xl transition-all shadow-sm flex items-center gap-2">
+                    <span>+</span> Submit New Project
+                </button>
+            </div>
+
+            <!-- Dynamic Project Grid Pipeline -->
+            <div id="projectGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Project Card Prototype -->
+                <div class="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-all">
+                    <div class="h-3 bg-gradient-to-r from-emerald-400 to-teal-500"></div>
+                    <div class="p-5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-start gap-2 mb-2">
+                                <h3 class="font-bold text-slate-900 line-clamp-1">IoT Automated Smart Farm</h3>
+                                <span class="text-[10px] font-semibold tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full uppercase">Completed</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mb-4 line-clamp-3">Automated crop hydration platform utilizing soil moisture telemetry and solar arrays linked to cloud servers.</p>
+                        </div>
+                        <div class="border-t border-slate-50 pt-4 flex items-center justify-between text-xs text-slate-400">
+                            <span>By: <strong>Arjun Mehta</strong></span>
+                            <span>CS - Sec B</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 2: ASSIGNMENT BUILDER & BLUEPRINT OUTLINER -->
+        <section id="panel-assignments" class="tab-panel hidden max-w-3xl mx-auto bg-white p-6 md:p-8 rounded-2xl border border-slate-100 shadow-sm space-y-6">
+            <div>
+                <h2 class="text-xl font-bold text-slate-900">Assignment Strategy Planner</h2>
+                <p class="text-sm text-slate-500">Select your assignment parameters to immediately output structured reading rubrics and thesis outlines.</p>
+            </div>
+
+            <form id="assignmentForm" class="space-y-4">
+                <div class="grid sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Subject domain</label>
+                        <select id="assignSubject" required class="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-sm bg-white">
+                            <option value="Computer Science">Computer Science & AI</option>
+                            <option value="Business Administration">Business & Marketing</option>
+                            <option value="Mechanical Systems">Mechanical & Structural Engineering</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Target Scope Length</label>
+                        <select id="assignLength" class="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-sm bg-white">
+                            <option value="Short Essay (1,500 words)">Short Report / Essay</option>
+                            <option value="Detailed Case Study (3,000 words)">Comprehensive Case Study</option>
+                            <option value="Technical Lab Thesis">Technical Lab & Code Manual</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Assignment Prompt Topic / Title</label>
+                    <input type="text" id="assignTopic" required placeholder="e.g. The impact of blockchain networks on supply chain logistics" 
+                           class="w-full p-3 border border-slate-200 rounded-xl focus:outline-none focus:border-indigo-500 text-sm">
+                </div>
+                <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium p-3 rounded-xl text-sm transition-all shadow-sm">
+                    Build Structural Outline
+                </button>
+            </form>
+
+            <!-- Blueprint Output Target Window -->
+            <div id="blueprintContainer" class="hidden border-2 border-indigo-50/70 bg-slate-50/50 p-5 rounded-xl space-y-4">
+                <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                    <h4 class="text-xs font-bold text-indigo-900 uppercase tracking-wide">📐 Generated Framework Blueprint</h4>
+                    <span class="text-[11px] text-slate-400 font-mono" id="blueprintMeta"></span>
+                </div>
+                <div id="blueprintOutput" class="text-sm space-y-3 text-slate-700 leading-relaxed font-mono"></div>
+            </div>
+        </section>
+
+
+        <!-- SECTION 3: MOCK INTERVIEW SIMULATOR -->
+        <section id="panel-interviews" class="tab-panel hidden max-w-4xl mx-auto grid md:grid-cols-3 gap-8">
+            <!-- Setup Control Suite -->
+            <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm h-fit space-y-4">
+                <h3 class="font-bold text-slate-900 text-base">Interview Dashboard</h3>
+                <div>
+                    <label class="block text-[11px] font-semibold text-slate-500 uppercase mb-1">Target Sector</label>
+                    <select id="interviewRole" class="w-full p-2.5 border border-slate-200 rounded-lg text-xs bg-white focus:outline-none focus:border-indigo-500">
+                        <option value="Software Engineer">Software Engineer (Tech)</option>
+                        <option value="Data Analyst">Data Analyst</option>
+                        <option value="Product Manager">Product Manager</option>
+                    </select>
+                </div>
+                <button onclick="startInterviewSession()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-medium p-2.5 rounded-lg text-xs transition-all shadow-sm">
+                    Launch Interactive Session
+                </button>
+            </div>
+
+            <!-- Live Dialogue Window Container -->
+            <div class="md:col-span-2 bg-white rounded-2xl border border-slate-100 shadow-sm min-h-[350px] flex flex-col justify-between overflow-hidden">
+                <div class="bg-slate-900 px-4 py-3 text-white text-xs font-medium flex justify-between items-center">
+                    <span class="flex items-center gap-2">
+                        <span class="w-2 height h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        AI Technical Recruiter Console
+                    </span>
+                    <span id="interviewStep" class="text-slate-400">Status: Inactive</span>
+                </div>
+
+                <!-- Live Feed Frame -->
