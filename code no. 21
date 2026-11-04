@@ -1,0 +1,89 @@
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+class Developer {
+public:
+    string name;
+    string role;
+
+    Developer(string n, string r) : name(n), role(r) {}
+};
+
+class Task {
+public:
+    string description;
+    string assignedTo;
+    string status;
+
+    Task(string desc, string dev, string stat = "Pending")
+        : description(desc), assignedTo(dev), status(stat) {}
+};
+
+class Project {
+public:
+    string projectName;
+    string deadline;
+    vector<Developer> developers;
+    vector<Task> tasks;
+    string status;
+
+    Project(string name, string dl) : projectName(name), deadline(dl), status("In Progress") {}
+
+    void addDeveloper(const Developer& dev) {
+        developers.push_back(dev);
+    }
+
+    void addTask(const Task& task) {
+        tasks.push_back(task);
+    }
+
+    void displayProjectDetails() {
+        cout << "\nProject: " << projectName << "\nDeadline: " << deadline << "\nStatus: " << status << endl;
+        cout << "\nDevelopers:\n";
+        for (auto& dev : developers)
+            cout << "- " << dev.name << " (" << dev.role << ")\n";
+
+        cout << "\nTasks:\n";
+        for (auto& task : tasks)
+            cout << "- " << task.description << " | Assigned to: " << task.assignedTo << " | Status: " << task.status << endl;
+    }
+};
+
+class Company {
+public:
+    string name;
+    string address;
+    vector<Project> projects;
+
+    Company(string n, string addr) : name(n), address(addr) {}
+
+    void addProject(const Project& proj) {
+        projects.push_back(proj);
+    }
+
+    void displayCompanyInfo() {
+        cout << "Company Name: " << name << "\nAddress: " << address << "\n\n";
+        cout << "Total Projects: " << projects.size() << "\n";
+        for (auto& proj : projects)
+            proj.displayProjectDetails();
+    }
+};
+
+int main() {
+    Company myCompany("TechNova", "123 Silicon Avenue");
+
+    Project p1("Mobile Banking App", "2025-12-01");
+    p1.addDeveloper(Developer("Alice", "Frontend"));
+    p1.addDeveloper(Developer("Bob", "Backend"));
+
+    p1.addTask(Task("Design Login Screen", "Alice"));
+    p1.addTask(Task("Build API Integration", "Bob"));
+
+    myCompany.addProject(p1);
+
+    myCompany.displayCompanyInfo();
+
+    return 0;
+}
