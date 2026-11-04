@@ -1,0 +1,152 @@
+
+import random
+
+app = Ursina()
+
+window.title = "SmartCampus: 3D Mission Engine"
+window.borderless = False
+window.fullscreen = False
+window.exit_button.visible = False
+window.fps_counter.enabled = True
+
+main_light = DirectionalLight(y=30, x=10, z=20)
+main_light.look_at(Vec3(0, 0, 0))
+main_light.color = color.white
+
+
+ambient_light = AmbientLight(color=color.rgba(100, 100, 120, 255))
+
+
+sky_dome = Sky(texture='sky_default')
+
+
+floor = Entity(
+    model='plane',
+    scale=(120, 1, 120),
+    texture='grass',
+    texture_scale=(40, 40),
+    collider='box',      # Enables strict physical ground calculations
+    color=color.gray
+)
+
+
+structures = []
+wall_positions = [
+    # (Position Vector, Scale Vector)
+    ((0, 4, 30), (40, 8, 2)),    # North Wall
+    ((-20, 4, 0), (2, 8, 60)),   # West Wall
+    ((20, 4, 0), (2, 8, 60)),    # East Wall
+]
+
+for pos, scl in wall_positions:
+    wall = Entity(
+        model='cube',
+        position=pos,
+        scale=scl,
+        texture='brick',
+        texture_scale=(scl[0]/2, scl[1]/2),
+        collider='box',
+        color=color.dark_gray
+    )
+    structures.append(wall)
+
+# Decorative Obstacles (Pillars providing spatial depth)
+for i in range(5):
+    pillar = Entity(
+        model='cylinder',
+        position=(random.randint(-15, 15), 3, random.randint(-15, 15)),
+        scale=(2, 6, 2),
+        texture='white_cube',
+        collider='box',
+        color=color.light_gray
+    )
+    structures.append(pillar)
+
+class ActiveTask:
+    def __init__(self, task_id, name, target_entity):
+        self.task_id = task_id
+        self.name = name
+        self.target_entity = target_entity
+        self.is_completed = False
+
+
+game_tasks = []
+collected_count = 0
+total_required_tasks = 4
+
+
+task_title_ui = Text(text="📋 OPERATIONAL TASKS ASSIGNED:", position=(-0.85, 0.45), scale=1.3, color=color.yellow)
+task_list_ui = Text(text="", position=(-0.85, 0.40), scale=1.1, color=color.white)
+mission_status_ui = Text(text="", position=(0, 0.35), origin=(0, 0), scale=2, color=color.emerald, visible=False)
+
+def update_ui_dashboard():
+    """Loops through system task states to update student dashboard display elements"""
+    global game_tasks, collected_count
+    ui_buffer = ""
+    for task in game_tasks:
+        status_marker = "✅ Complete" if task.is_completed else "❌ Pending Scan"
+        ui_buffer += f"• {task.name}: [{status_marker}]\n"
+    
+    task_list_ui.text = ui_buffer
+    
+    if collected_count >= total_required_tasks:
+        mission_status_ui.text = "🏆 MISSION SUCCESS\nAll Core Tasks Validated!"
+        mission_status_ui.visible = True
+
+
+task_colors = [color.red, color.azure, color.orange, color.magenta]
+task_names = ["Secure Quantum Reactor Core", "Calibrate Main Control Arrays", "Extract Diagnostic Logs", "Reset Thermal Valves"]
+
+for i in range(total_required_tasks):
+
+    interactive_node = Entity(
+        model='sphere',
+        position=(random.choice([-12, 0, 12]), 1.5, random.choice([-10, 10, 20])),
+        scale=(1.2, 1.2, 1.2),
+        color=task_colors[i],
+        collider='sphere'
+    )
+
+    Entity(model='cube', parent=interactive_node, scale=(1.5, 0.2, 0.2), color=color.white)
+    
+    task_object = ActiveTask(task_id=i, name=task_names[i], target_entity=interactive_node)
+    game_tasks.append(task_object)
+
+update_ui_dashboard()
+
+
+player = FirstPersonController(
+    position=(0, 2, -10),
+    speed=8,
+    jump_height=1.5
+)
+player.cursor.color = color.red # Crosshair asset mapping
+
+
+def update():
+    """Continuous game loop executing at runtime frame rates (FPS)"""
+    global collected_count
+    
+    for task in game_tasks:
+        if not task.is_completed:
+            task.target_entity.rotation_y += 50 * time.dt
+            task.target_entity.y = 1.5 + (sin(time.to_seconds() * 3 + task.task_id) * 0.2)
+            
+            # Real-Life Physical Proximity Proving (Distance vector verification math)
+            distance_to_player = distance(player.position, task.target_entity.position)
+            
+            # If the player physically approaches within touching vector radius distance
+            if distance_to_player < 2.5:
+                task.is_completed = True
+                collected_count += 1
+                
+                # Visual FX destruction sequence animation
+                task.target_entity.animate_scale((0,0,0), duration=0.3)
+                destroy(task.target_entity, delay=0.4)
+                
+                # Update UI logs immediately
+                update_ui_dashboard()
+                print(f"[Engine Alert]: Registered extraction for {task.name}")
+
+
+app.run()
