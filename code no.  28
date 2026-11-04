@@ -1,0 +1,198 @@
+
+class AcademicSystemException extends Error {
+    constructor(message, errorCode) {
+        super(message);
+        this.name = "AcademicSystemException";
+        this.errorCode = errorCode;
+        this.timestamp = new Date().toISOString();
+    }
+}
+
+
+class UserProfile {
+    #internalSecurityKey; // Encapsulated private field mapping (ES2020 feature)
+
+    constructor(id, name, email) {
+        if (this.constructor === UserProfile) {
+            throw new AcademicSystemException("Cannot instantiate abstract UserProfile directly.", "ERR_ABSTRACT_INSTANTIATION");
+        }
+        this.id = id;
+        this.name = name;
+        this.email = email;
+        this.#internalSecurityKey = Math.random().toString(36).substring(2, 11).toUpperCase();
+        this.accountCreated = new Date();
+    }
+
+
+    get verificationTag() {
+        return `USER-${this.id}-${this.name.split(' ')[0].toUpperCase()}`;
+    }
+
+    getDetailsSummary() {
+        return `ID: ${this.id} | Name: ${this.name} | Contact: ${this.email}`;
+    }
+}
+
+
+class Student extends UserProfile {
+    constructor(id, name, email, department) {
+        super(id, name, email);
+        this.department = department;
+        this.enrolledCourses = new Map(); // Dynamic Course Registry Storage Map
+        this.academicTranscript = [];     // Array mapping historical grades
+    }
+
+   registerCourse(courseCode, courseDetails) {
+        if (this.enrolledCourses.has(courseCode)) {
+            throw new AcademicSystemException(`Enrollment Failure: Course ${courseCode} is already registered.`, "ERR_DUPLICATE_COURSE");
+        }
+        
+        const enrollmentRecord = {
+            ...courseDetails,
+            dateEnrolled: new Date(),
+            attendanceLogs: [],
+            status: "Active"
+        };
+        
+        this.enrolledCourses.set(courseCode, enrollmentRecord);
+        return true;
+    }
+
+
+    logAttendance(courseCode, status = "Present") {
+        if (!this.enrolledCourses.has(courseCode)) {
+            throw new AcademicSystemException(`Operation Aborted: Student is not registered in ${courseCode}`, "ERR_INVALID_COURSE_ACCESS");
+        }
+        
+        const course = this.enrolledCourses.get(courseCode);
+        course.attendanceLogs.push({
+            date: new Date().toLocaleDateString(),
+            status: status
+        });
+    }
+
+
+    postFinalGrade(courseCode, numericalScore) {
+        if (!this.enrolledCourses.has(courseCode)) {
+            return false;
+        }
+
+        this.academicTranscript.push({
+            courseCode: courseCode,
+            title: this.enrolledCourses.get(courseCode).title,
+            credits: this.enrolledCourses.get(courseCode).credits || 3,
+            score: numericalScore
+        });
+
+
+        this.enrolledCourses.delete(courseCode);
+        return true;
+    }
+
+
+    calculateGPA() {
+        if (this.academicTranscript.length === 0) return 0.00;
+
+
+        const totalPoints = this.academicTranscript.reduce((accumulator, record) => {
+            let gradePoint = 0;
+            if (record.score >= 90) gradePoint = 4.0;
+            else if (record.score >= 80) gradePoint = 3.0;
+            else if (record.score >= 75) gradePoint = 2.5;
+            else if (record.score >= 60) gradePoint = 2.0;
+            else gradePoint = 0.0;
+
+            return accumulator + (gradePoint * record.credits);
+        }, 0);
+
+        const totalCredits = this.academicTranscript.reduce((acc, current) => acc + current.credits, 0);
+        return totalCredits === 0 ? 0.00 : parseFloat((totalPoints / totalCredits).toFixed(2));
+    }
+
+
+    getDetailsSummary() {
+        return `${super.getDetailsSummary()} | Dept: ${this.department} | Current GPA: ${this.calculateGPA()}`;
+    }
+}
+
+
+const AcademyNetworkController = {
+    mockServerDelay: (ms) => new Promise(resolve => setTimeout(resolve, ms)),
+
+
+    async fetchGlobalCourseCatalog() {
+
+        await this.mockServerDelay(1200);
+
+
+        if (Math.random() > 0.95) {
+            throw new AcademicSystemException("Cloud Registry Handshake Timeout", "ERR_SERVER_OFFLINE");
+        }
+
+        return [
+            { code: "CS-101", title: "Introduction to Computer Architecture", credits: 4 },
+            { code: "AI-302", title: "Applied Convolutional Neural Networks", credits: 4 },
+            { code: "MAT-201", title: "Discrete Mathematics & Logic Matrices", credits: 3 },
+            { code: "ENG-104", title: "Technical Communication Practices", credits: 2 }
+        ];
+    }
+};
+
+function runSystemDiagnosticTest() {
+    console.log("🚀 Initializing Academic Application Environment Diagnostic Check...\n");
+
+    try {
+ 
+        const primaryStudent = new Student("STU-2026-904", "Rahul Sharma", "rahul.sharma@campus.edu", "Computer Science");
+        console.log(`[Initialization Success]: Dynamic Tag Created -> ${primaryStudent.verificationTag}`);
+
+ 
+        console.log("🌐 Pinging Cloud Catalog Services...");
+        const catalogData = await AcademyNetworkController.fetchGlobalCourseCatalog();
+        console.log(`[Fetch Success]: Retrieved ${catalogData.length} active master course schemas.`);
+
+        // 3. Process Business Logic Transformations (Course Registrations)
+        console.log("\n📋 Injecting Enrollments into Student Profile Maps...");
+        const targetCourse1 = catalogData.find(c => c.code === "CS-101");
+        const targetCourse2 = catalogData.find(c => c.code === "AI-302");
+
+        primaryStudent.registerCourse(targetCourse1.code, { title: targetCourse1.title, credits: targetCourse1.credits });
+        primaryStudent.registerCourse(targetCourse2.code, { title: targetCourse2.title, credits: targetCourse2.credits });
+        
+        console.log(`Active Enrollment Registry Count: ${primaryStudent.enrolledCourses.size}`);
+
+ 
+        primaryStudent.logAttendance("CS-101", "Present");
+        primaryStudent.logAttendance("CS-101", "Present");
+        primaryStudent.logAttendance("AI-302", "Present");
+        console.log("📝 Attendance verification matrices updated successfully.");
+
+ 
+        console.log("\n🎯 Finalizing Module Examinations & Posting Grading Scores...");
+        primaryStudent.postFinalGrade("CS-101", 94); // Maps to 4.0 Grade Point
+        primaryStudent.postFinalGrade("AI-302", 82); // Maps to 3.0 Grade Point
+
+ 
+        console.log("\n=================== STUDENT REPORT CARD SUMMARY ===================");
+        console.log(primaryStudent.getDetailsSummary());
+        console.log("Transcript Archive Record Set:", primaryStudent.academicTranscript);
+        console.log("===================================================================");
+
+ 
+        console.log("\n⚠️ Testing Robustness Framework (Attempting Malformed Operation)...");
+        primaryStudent.logAttendance("CS-101"); // Error: Course was already removed/deleted post-grading
+
+    } catch (error) {
+        if (error instanceof AcademicSystemException) {
+            console.error(`\n🛑 System-Intercepted Exception Logged [${error.errorCode}]: ${error.message}`);
+            console.error(`Incident Timestamp Tracker: ${error.timestamp}`);
+        } else {
+            console.error("\n💥 Critical Uncaught Runtime Core System Failure:", error);
+        }
+    } finally {
+        console.log("\n🏁 Core Diagnostic Verification Routines Concluded.");
+    }
+}
+
+
+runSystemDiagnosticTest();
