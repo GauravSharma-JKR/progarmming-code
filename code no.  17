@@ -1,0 +1,49 @@
+#include <iostream>
+using namespace std;
+
+// Recursive function to calculate factorial
+unsigned long long factorialRecursive(int n) {
+    if (n <= 1) return 1;
+    return n * factorialRecursive(n - 1);
+}
+unsigned long long factorialIterative(int n) {
+    unsigned long long fact = 1;
+    for (int i = 1; i <= n; ++i) {
+         fact *= i;
+    }
+    return fact;
+}
+
+// Function to print the pattern 5! = 5*4*3*2*1 = 120
+void printPattern(int n) {
+    cout << n << "! = ";
+    for (int i = n; i >= 1; --i) {
+        cout << i << (i == 1 ? "" : " * ");
+    }
+}
+
+int main() {
+    int n, choice;
+    cout << "Enter a number: ";
+    cin >> n;
+
+    if (n < 0) {
+        cout << "Factorial not defined for negative numbers." << endl;
+        return 0;
+    }
+
+    cout << "Choose Method:\n1. Iterative\n2. Recursive\nChoice: ";
+    cin >> choice;
+
+    unsigned long long result;
+    if (choice == 1) {
+        result = factorialIterative(n);
+    } else {
+        result = factorialRecursive(n);
+    }
+
+    printPattern(n);
+    cout << " = " << result << endl;
+
+    return 0;
+}
