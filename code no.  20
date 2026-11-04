@@ -1,0 +1,148 @@
+#include <iostream>
+#include <string>
+#include <vector>
+using namespace std;
+
+class BusinessAccount
+{
+    public:
+    string accountName;
+    string ownerName;
+    double balance;
+
+    BusinessAccount(string acc, string own, double bal)
+    {
+        accountName = acc;
+        ownerName = own;
+        balance = bal;
+
+    }
+    void display() 
+    {
+        cout << "Account Name: " << accountName << "\nOwner: " << ownerName << "\nBalance: $" << balance << endl;
+
+    }
+};
+
+class Project 
+{
+    public:
+    string projectName;
+    double budget;
+    string deadline;
+
+    Project(string name, double bud, string dead)
+    {
+        projectName = name;
+        budget = bud;
+        deadline = dead;
+
+    }
+    void display() {
+        cout << "Project: " << projectName << "\n Budget: $" << budget <<"\nDeadline: " << deadline  << endl;
+
+    }
+
+};
+class Sale 
+{
+    public:
+    string productName;
+    int unitSold;
+    double revenue;
+
+    Sale(string prod, int unit, double rev)
+    {
+        productName = prod;
+        unitSold = unit;
+        revenue = rev;
+
+    }
+    void display()
+    {
+        cout <<"Product: " << productName << "\nUnitSold: " << unitSold << "\nRevenue: $" << revenue << endl;
+
+    }
+};
+int main() {
+    vector<BusinessAccount> accounts ;
+    vector<Project> projects;
+    vector<Sale> sales;
+
+    int choice;
+    do {
+        cout << "\n___BusinessManagement System___\n";
+        cout << "1.Add Business Account \n";
+        cout << "2.View Business Account \n";
+        cout << "3.Add Project \n";
+        cout << "4.View Project \n";
+        cout << "5.Add Sale Record \n";
+        cout << "6.View Sales/Market \n";
+        cout << "0.Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice ;
+        cin.ignore();
+        if (choice == 1)  {
+            string acc, own;
+            double bal;
+            cout <<"Enter Account Name: ";
+            getline (cin, acc);
+            cout << "OWner Name: ";
+            getline(cin, own);
+            cout << "Enter Balance: $";
+            cin >> bal;
+            accounts.push_back(BusinessAccount(acc,own,bal));
+            
+
+        }
+        else if(choice == 2)
+        {
+            cout <<"\n___Business Accounts___\n";
+            for(auto & acc : accounts)
+            acc.display();
+
+
+        }
+        else if(choice == 3)
+        {
+            string name,dead;
+            double bud;
+            cout << "Enter Project Name: ";
+            getline(cin, name);
+            cout << "Enter Budget: $";
+            cin >> bud;
+            cin.ignore();
+            cout <<"Enter Deadline(dd-mm-yyyy):";
+            getline(cin, dead);
+
+            projects.push_back(Project(name,bud, dead));
+        }
+        else if(choice == 5)
+        {
+            string prod;
+            int unit;
+            double rev;
+            cout << "Enter Units Sold: ";
+            cin >> unit;
+            cout << "Enter Revenue: $";
+            cin >> rev;
+            cin.ignore();
+            sales.push_back(Sale(prod, unit, rev));
+        }
+        else if(choice == 6) 
+        {
+            cout << "\n___Sales Market___\n";
+            for(auto & sale : sales)
+            sale.display();
+        }
+        else if (choice == 0) {
+            cout << "Exiting...\n";
+
+        }
+        else{
+            cout << "Invalid choice!\n";
+        }
+    }
+    while (choice != 0);
+    return 0;
+}
