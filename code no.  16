@@ -1,0 +1,53 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+class CompanyAccount {
+    private:
+    string companyName;
+    string registrationNumber;
+    string address;
+    double balance;
+    
+
+    public:
+    CompanyAccount() : balance(0.0) {}
+
+    void createAccount() {
+        cout << "Enter Company Name: ";
+        getline(cin, companyName);
+
+        cout << "Enter Rigestration Number: ";
+        getline(cin, registrationNumber);
+
+        cout << "Enter Company Address: ";
+        getline(cin, address);
+
+        cout << "Enter Initial Balance: $";
+        cin >> balance;
+        cin.ignore();
+        
+        cout << "\nCompany Account Created Successfully!\n";
+
+    }
+
+    void displayAccountInfo()
+    const {
+        cout << "\n--- Company Account Summary ---" << endl;
+        cout << "Company Name: " << companyName << endl;
+        cout << "Registration Number: " << registrationNumber << endl;
+        cout << "Address: "  << address << endl;
+        cout << "Account Balance: $" << balance << endl;
+
+    }
+};
+
+
+int main()
+{
+    CompanyAccount  myCompany;
+    myCompany.createAccount();
+    myCompany.displayAccountInfo();
+
+    return 0;
+}
