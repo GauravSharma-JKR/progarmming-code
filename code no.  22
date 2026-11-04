@@ -1,0 +1,90 @@
+#include <iostream>
+#include <vector>
+#include <cmath>
+
+using namespace std;
+
+class LinearRegression 
+{
+    private:
+    double learningRate;
+    int iterations;
+    double weight;
+    double bias;
+
+    public:
+    LinearRegression(double lr = 0.01, int iters = 1000)
+    {
+        learningRate = lr;
+        iterations = iters;
+        weight = 0.0;
+        bias = 0.0; 
+    }
+
+    void trian(const vector<double>& X, const vector<double>& Y) 
+    {
+        int n = X.size();
+
+        for(int i = 0; i < iterations ; ++i)
+        {
+            double dw = 0.0;
+            double db = 0.0;
+            
+            for(int j = 0; j < n; ++j)
+            {
+                double y_pred = weight*X[j]+bias;
+                dw += (y_pred - Y[j])*X[j];
+            }
+
+            dw /= n;
+            db /= n;
+
+            weight -= learningRate*dw;
+            bias -= learningRate*db;
+
+            if(i%100 == 0)
+            {
+                cout << "Eteration " << i << "  - Loss: " << computeLoss(X, Y) << endl;
+            }
+        }
+    }
+    double predict(double x) {
+        return weight * x + bias;
+
+    }
+
+    double computeLoss(const vector<double>& X, const vector<double>& Y)
+    {
+        double totalLoss = 0.0;
+        int n  = X.size();
+
+        for(int i = 0; i < n; ++i) {
+            double y_pred = weight * X[i] + bias;
+            totalLoss += pow(y_pred - Y[i], 2);
+        }
+        return totalLoss / n;
+
+    }
+
+    void printModel()
+    {
+        cout << "Final model: y = " << weight << "*x + " << bias << endl;
+    }
+
+};
+
+int main() 
+{
+    vector<double> X = {1.0, 2.0, 3.0, 4.0, 5.0};
+    vector<double> Y = {2.0, 4.0, 6.0, 8.0, 10.0};
+
+    LinearRegression model(0.01, 1000);
+    model.trian(X, Y);
+    model.printModel();
+    
+    double testX = 6.0;
+    cout << "Prediction for X = "  << testX << " is y = " << model.predict(testX) << endl;
+
+    return 0;
+
+}
