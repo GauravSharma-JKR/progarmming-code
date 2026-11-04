@@ -1,0 +1,81 @@
+#include <iostream>
+#include <vector>
+#include <string>
+
+using namespace std;
+
+class Problem 
+{
+    public:
+    string title;
+    string description;
+
+    Problem(string t, string d)
+    {
+        title = t;
+        description = d;
+    }
+    void display() {
+        cout << "\n[Problem]: " << title << "\n Description: " << description << "\n";
+
+    }
+};
+
+class AISolution 
+{
+    public:
+    string area;
+    string solution;
+    
+    AISolution(string a, string s)
+    {
+        area =a;
+        solution = s;
+    }
+    void display()
+    {
+        cout << "\n[AI in " << area << "]Solution: \n" << solution << "\n";
+
+    }
+};
+
+class FutureAI
+{
+    vector<Problem>problems;
+    vector<AISolution>solution;
+
+    public:
+    void addProblemsAndSolution()
+    {
+        problems.push_back(Problem("Health Diagnosis", "People in remote areas lack access to expert doctors. "));
+        solution.push_back(AISolution("Healtheare ", "AI models diagnose diseases viamobile scams and suggest treatment. "));
+        problems.push_back(Problem("Climate change", "Rising pollution and global warning."));
+        solution.push_back(AISolution("Environment", "AI Predicts disasters sarly and suggests eco-friendly solution. "));
+        problems.push_back(Problem("Education Gap","Student in rural area lack quality teachers."));
+        solution.push_back(AISolution("Education","AI tutors provid personalized learning through voice-based interaction."));
+        problems.push_back(Problem("Traffic Accidents ", "High number of road accidents due to huma  error. "));
+        solution.push_back(AISolution("Transport", "AI-powered autonomous vehicles reduce accidents."));
+        problems.push_back(Problem("Mental Health", "Many people suffer from stress and depression."));
+        solution.push_back(AISolution("Mental Health", "AI chatbosis provide 2A/7 emotional support and connect to therapists."));
+    }
+    void showImpact() {
+        cout << "=== AI & ML in Future to solve Human Problems===\n";
+        for(size_t i = 0; i < problems.size(); ++i)
+        {
+            problems[i].display();
+            solution[i].display();
+            cout << " ====== \n";
+        }
+    }
+    
+};
+
+int main() 
+{
+    FutureAI aiSystem;
+    aiSystem.addProblemsAndSolution();
+    aiSystem.showImpact();
+
+    cout << "\n >> This simulation shows how AI/ML could positively impact the future. \n";
+    return 0;
+}
