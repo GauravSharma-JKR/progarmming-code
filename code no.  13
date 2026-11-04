@@ -1,1 +1,182 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <thread>
+#include <chrono>
+
+using namespace std;
+
+void delay(int ms) {
+    this_thread::sleep_for(chrono::milliseconds(ms));
+}
+
+class Character {
+protected:
+    string name;
+    int health;
+    int maxHealth;
+
+public:
+   Character(string name, int hp) : name(name), health(hp), maxHealth(hp) {}
+
+   virtual void takeDamage(int dmg) {
+    health = dmg;
+    if (health < 0 ) health = 0;
+
+   }
+
+   void heal(int amount) {
+    health += amount;
+    if (health > maxHealth) health = maxHealth;
+
+   }
+
+   bool isAlive() {
+    return health > 0;
+
+   }
+   int getHealth() {
+    return health;
+
+   }
+   string getName() {
+    return name;
+   }
+
+   void displayStatus() {
+    cout << name << " Health: " << health << "/" << maxHealth << endl;
+   }
+
+};
+
+class Player : public Character {
+    private:
+    int ammo;
+    int maxAmmo;
+    int medkits;
+
+    public:
+       Player(string name, int hp, int ammo, int kits)
+         : Character(name,hp), ammo(ammo), maxAmmo(ammo), medkits(kits) {}
+
+         void shoot(Character &enemy) {
+            if (ammo <= 0) {
+                cout << " out of ammo! Reload first.\n";
+                return;
+
+            }
+            int damage = rand() % 21 + 10; 
+            cout << " you shot " << enemy.getName() << " for " << damage << " damage.\n";
+            enemy.takeDamage(damage);
+            ammo--;
+        }
+
+        void reload() {
+            cout << " reloading...\n";
+            delay(1500);
+            ammo = maxAmmo;
+            cout << " Reloaded! Amm0 full.\n";
+        }
+
+        void useMedkit() {
+            if (medkits <= 0) {
+                cout << " No medkits left!\n";
+            }
+            cout << " Using medkit...\n";
+            delay(1000);
+            heal(30);
+            medkits--;
+            cout << " Healed 30 HP. Current Health: " << getHealth() << "\n";
+        }
+
+        void showInventory() {
+            cout << " Player Stsats:\n";
+            displayStatus();
+            cout << " Ammo  : " << ammo << "\n";
+            cout << "Medkits: " << medkits << "\n";
+        }
+
+    int getAmmo() { return ammo; }
+    int getMedkits() { return medkits; }
+};
+
+class Enemy : public Character {
+    public:
+    Enemy(string name, int hp) : Character(name, hp) {}
+    void attack(Player &player) {
+        if (!isAlive()) return;
+        int damage = rand() % 16 + 5; 
+        cout << " " << getName() << " attacks you for " << damage << " damage!\n";
+        player.takeDamage(damage);
+    }
+};
+
+void showActions() {
+    cout << "\n  Choose your action:\n";
+    cout << "1. Shoot\n" ;
+    cout << "2. Reload\n";
+    cout << "3. Use Medkit\n";
+    cout << "4. View Ststus\n";
+    cout << "Enter choice: ";
+
+}
+
+void startGame() {
+    srand(time(0));
+    Player player("Soldier",100, 6, 2);
+    Enemy enemy("Enemy Tropper", 100);
+     
+    cout << "\n WELCOME TO BATTLEFIELD: TEXT OPS\n";
+    cout << "Fight till the end!\n\n";
+
+    while (player.isAlive() && enemy.isAlive()) {
+        player.showInventory();
+        enemy.displayStatus();
+        showActions();
+
+        int choice;
+        cin >> choice;
+        cout << "\n";
+
+        switch (choice) {
+            case 1:
+            player.shoot(enemy);
+            break;
+            case 2:
+            player.reload();
+            case 3:
+            player.useMedkit();
+            case 4:
+            player.showInventory();
+            enemy.displayStatus();
+            break;
+        default:
+           cout << " Invalid choice. Turn skipped.\n";
+        }
+
+        delay(1000);
+
+        if (enemy.isAlive()) {
+            enemy.attack(player);
+
+        }
+
+        delay(1500);
+
+    }
+
+    cout << "\n=========================\n";
+    if (player.isAlive())
+    cout << " You won the battle!\n";
+    else
+    cout << " You were defeated...\n";
+
+}
+
+int main() {
+    startGame();
+    return 0;
+}
+
+
 
