@@ -1,0 +1,57 @@
+#include <iostream>
+#include <vector>
+
+using namespace std;
+
+// Method 1: Iteration (Loop)
+long long factorialIterative(int n) {
+    long long fact = 1;
+    for (int i = 1; i <= n; ++i) fact *=i;
+    return fact;
+}
+
+// Method 2: Recursion
+long long factorialRecursive(int n) {
+    if (n <= 1 ) return 1;
+    return n * factorialRecursive(n - 1);
+}
+
+// Method 3: Pattern & Structure
+void printFactorialPattern(int n) {
+    cout << n << "! = ";
+    for(int i = n; i >= 1; --i) {
+        cout << i << (i == 1? "" : " * ");
+    }
+    cout << " =  " << factorialIterative(n) << endl;
+}
+
+int main() {
+    int choice, num;
+    do {
+        cout << "\--- Factorial options ---\n";
+        cout << "1. Calculate using Loop\n";
+        cout << "2. Calculate using Recursion\n";
+        cout << "3.Show Structure/Pattern\n";
+        cout << "4.Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        if (choice >= 1 && choice <= 3) {
+            cout << "Enter a positive integer: ";
+            cin >> num;
+            if (num < 0) {
+                cout << "Factorial not defined for negative numbers.\n";
+                continue;
+
+            }
+
+            switch (choice) {
+                case 1: cout << "Factorial: " << factorialIterative(num) <<endl; break;
+                case 2: cout << "Factorial: " << factorialRecursive(num) <<endl; break;
+                case 3: printFactorialPattern(num); break;
+            }
+        }
+    } while (choice != 4);
+
+    return 0;
+}
