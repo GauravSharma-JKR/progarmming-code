@@ -1,0 +1,126 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <string>
+#include <iomanip>
+
+/**
+ * CLASS: CaluculationResult 
+ * Purpose: A data Structure to hold each individual operation's data.
+ */
+struct CalculationResult {
+    double input;
+    double sumResult;
+    double unitCount;
+};
+
+/**
+ * CLASS: UnitEngine
+ * Purpose: Handles the core logic and history management.
+ */
+class UnitEngine {
+    private:
+       const double BASE = 100.0;
+       std::vector<CalculationResult> history;
+
+public:
+    // Core Logic: The "Work Function" 
+    void processValue(double val) {
+        CalculationResult res;
+        res.input = val;
+        res.sumResult = val + BASE;
+        res.unitCount = val / BASE;
+
+        history.push_back(res);
+        displaySingle(res);
+
+    }
+
+    void displaySingle(const CalculationResult& res) {
+        std::cout << "\n[DATA PROCESSED]" << std::endl;
+        std::cout << "Input: " << res.input << " | Sum (+100): " << res.sumResult
+              << " | Units of 100: " << res.unitCount << std::endl;
+
+    }
+
+    // Software Feature: Export to File
+    void exportToLog() {
+        std::ofstream outFile("calcution_log.txt");
+        if (!outFile) {
+           std::cerr << "Errpr:Could not create log file." << std::endl;
+           return;
+        }
+
+        outFile << "ID, Input, Sum_Result, Unit_count\n";
+        for (size_t i = 0; i < history.size(); ++i) {
+            outFile << i + 1 << ", " << history[i].input << ", " << history[i].sumResult << ", " << history[i].unitCount <<"\n";
+
+        }
+        outFile.close();
+        std::cout << "\n>>> System: Log extort to 'calculation_log.txt' successfully." << std:: endl;
+
+    }
+
+    void showHistory() {
+        if (history.empty()) return;
+        std::cout <<"\n--- SESSION HISTORY ---" << std::endl;
+        for (const auto& item : history) {
+            std::cout << "IN: " << item.input << " -> SUM: " << item.sumResult << std::endl;
+
+        }
+    }
+    
+};
+
+/**
+ *  Function: UserInterface
+ * Purpose: Manages the software menu and user interaction.
+ */
+
+ void displayMenu() {
+    std::cout << "\n======================================" << std::endl;
+    std::cout << " CENTURION UNIT PROCESSOR v1.0 " << std::endl;
+    std::cout << "=======================================" << std::endl;
+    std::cout << "1. Process External Number" << std::endl;
+    std::cout << "2. View Session History" << std::endl;
+    std::cout << "3. Export dats to .TXT" << std::endl;
+    std::cout << "4. Exit" << std::endl;
+    std::cout << "Choice: ";
+ }
+
+ int main() {
+    UnitEngine engine;
+    int choice =0;
+    double val;
+
+    while (choice != 4) {
+        displayMenu();
+          if (!(std::cin >> choice)) {
+            std::cout << "Inbalid Input. Restarting..." << std::endl;
+            std::cin.clear();
+            std::cin.ignore(1000, '\n');
+            continue;
+          }
+
+          switch (choice) {
+            case 1:
+            std::cout << "Enter External Number:";
+            std::cin >> val;
+            engine.processValue(val);
+            break;
+            case 2:
+            engine.showHistory();
+            break;
+            case 3:
+            engine.exportToLog();
+            break;
+            case 4:
+            std::cout << "Shutting down system..." << std::endl;
+            break;
+            default:
+            std::cout << "Selection out of range." << std::endl;
+
+          }
+    }
+     return 0;
+ }
