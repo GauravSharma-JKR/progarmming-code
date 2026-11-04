@@ -1,0 +1,150 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <chrono>
+#include <stdexcept>
+#include <numeric>
+
+// ---Configuration ---
+// Define a large number of integers (e.g., 100 million integers = 400MB)
+// you can increase this , but be minful of your system 's avaible RAM.
+
+const long long ALLOCATION_SIZE = 100'000'000;
+using namespace std::chrono;
+/**
+ *  @brief Measures the duration of a function call.
+ *  @tparam Func The type of the function to time.
+ *  @param func The function to execute.
+ *  @return The duration in milliseconds. 
+ */
+template <typename Func>
+long long  time_operation(Func func) {
+    auto start = high_resolution_clock::now();
+    func();
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<milliseconds>(stop - start);
+    return duration.count();
+}
+
+/**
+ * @brief Demonstrates allocating a large chunk of memory using std::vector (safe way).
+ * @param data_vector Reference to the vector to store the allocated memory.
+ 
+ */
+void allocate_large_vector(std::vector<int>& data_vector) {
+    std::cout << "--- 1.Safe Dynamic RAM Allocation (std::vector) ---\n";
+    std::cout << "Attempting to allocate " << ALLOCATION_SIZE * sizeof(int) / (1024 * 1024)
+                << "MB of memory...\n";
+
+    try {
+        // This is where the actual large allocation happens on the head.
+        // std::iota(data_vector.begin(), data_vector.end(), 0);
+        data_vector.resize(ALLOCATION_SIZE);
+        std::iota(data_vector.begin(), data_vector.end(), 0);
+        std::cout << "Allocation successful. Total elements:" << data_vector.size() << "\n";
+    } catch (const std::bad_alloc& e) {
+     std::cerr << "ERROR: Failed to allocate vector memory (std::bad_alloc). "
+                << "Try reducing ALLOCATION_SIZE.\n" << e.what() << std::endl;
+        // The program should ideally exit or handle this gracefully.
+        throw;
+    }
+
+}
+
+/**
+ * @brief Demonstrates writing the data to disk for persistent storage (high I/O throughput).
+ * @param data_vector The constaining the data to write.
+ */
+void write_large_data_to_file(const std::vector<int>& data_vector) {
+    std::cout << "\n--- 2. High-Throughput Storage (Binary File I/O) ---\n";
+    const char* filename = "big_memory_dump.bin";
+
+    std::ofstream outfile(filename, std::ios::binary);
+
+    if (!outfile.is_open()) {
+        std::cerr << "ERROR: Could not open file for writting : " << filename << std::endl;
+        return;
+    }
+
+    // Calculate the size in bytes to write
+    size_t bytes_to_write = data_vector.size() * sizeof(int);
+
+    // Write the vector's raw memory block directly to the file.
+    // This is the fastest way to achieve high I/O throughput in c++.
+    outfile.write(
+        reinterpret_cast<const char*>(data_vector.data()),
+        bytes_to_write
+
+    );
+    if (outfile.good()) {
+        std::cout << "Successfully wrote " << bytes_to_write / (1024 * 1024)
+                  << "  MB of data to ' " << filename << "'.\n";
+    }
+    else {
+        std::cerr << "ERROR: An error occurred during file writing.\n";
+
+    }
+
+    // The file is closed automatically when 'outfile' goes out of scope (RaII)
+
+    
+}
+
+/**
+ * @brief Demonstrates manual, low-level memory allocation (Advanced/Legacy).
+ */
+void allocate_raw_array() {
+    std::cout << "\n--- 3.low-level Manual Allocation raw memory (std::bad_alloc).\n";
+    int* raw_data = nullptr;
+
+    try {
+        // Manual allocation of the array on the heap
+        raw_data = new int[ALLOCATION_SIZE];
+        raw_data[0] = 123;
+        raw_data[ALLOCATION_SIZE - 1] = 456;
+
+        std::cout << "Raw array allocation successful.\n";
+    }
+    catch (const std::bad_alloc& e) {
+        std::cerr << "ERROR: Failed to allocate raw array memory (std::bad_alloc).\n";
+        return;
+
+    }
+
+    // CRITICAL: Must manually release the memory to prevent a memory leak!
+    delete[] raw_data;
+    std::cout << "Raw array memory released successfully using delete[].\n";
+
+}
+
+int main() {
+    std::vector<int> big_data_vec;
+    long long duration_ms;
+
+    std::cout << "C++ Big Memory and Storage Throughput Manager\n"
+              << "=============================================\n";
+    
+    // 1. Time Vector Allocation 
+    duration_ms = time_operation([&]() {
+        allocate_large_vector(big_data_vec);
+
+    });
+    std::cout << "Time taken for Vector Allocation: " << duration_ms << " ms\n";
+     
+    // Check if allocation was successful before proceeding 
+    if (big_data_vec.empty()) {
+        std::cerr << "\nExiting due to previous memory allocation failure.\n";
+        return 1;
+
+    }
+    // 2.Time File I/O (Storage Throughput )
+    duration_ms = time_operation([&]() {
+        write_large_data_to_file(big_data_vec);
+
+    });
+    std::cout << "Time taken for File Write I/O: " << duration_ms << " ms\n";
+     
+    //Memory cleanup: big_data_vec destruction runs here, freeing the heap memory.
+    std::cout << "\nProgram finished. The memory held by std:: vector is now automatically freed.\n";
+        
+}
